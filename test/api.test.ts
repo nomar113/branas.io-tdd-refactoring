@@ -43,59 +43,61 @@ test("Deve criar uma conta para um motorista", async function () {
 	expect(outuptGetAccount.car_plate).toBe(input.carPlate);
 });
 
-test("Deve criar uma conta com CPF inválido -1", async function () {
+test("Deve criar uma conta com CPF inválido", async function () {
 	const input = {
 		name: "John Doe",
 		email: `john.doe${Math.random()}@gmail.com`,
 		cpf: "12312312312",
 		isPassenger: true
 	};
-	const output = await axios.post("http://localhost:3000/signup", input);
-	expect(output.data).toBe(-1)
+	const responseSignup = await axios.post("http://localhost:3000/signup", input);
+	expect(responseSignup.status).toBe(422);
+	const outputSignup = responseSignup.data;
+	expect(outputSignup.message).toBe("Invalid cpf");
 });
 
-test("Deve testar uma conta com e-mail inválido -2", async function () {
+test("Deve testar uma conta com e-mail inválido", async function () {
 	const input = {
 		name: "John Doe",
 		email: `john.doe${Math.random()}gmail.com`,
 		cpf: "87748248800",
 		isPassenger: true
 	};
-	const output = await axios.post("http://localhost:3000/signup", input);
-	expect(output.data).toBe(-2)
+	const responseSignup = await axios.post("http://localhost:3000/signup", input);
+	expect(responseSignup.status).toBe(422);
+	const outputSignup = responseSignup.data;
+	expect(outputSignup.message).toBe("Invalid email");
 });
 
-test("Deve testar uma conta com nome inválido -3", async function () {
+test("Deve testar uma conta com nome inválido", async function () {
 	const input = {
 		name: "John",
 		email: `john.doe${Math.random()}@gmail.com`,
 		cpf: "87748248800",
 		isPassenger: true
 	};
-	const output = await axios.post("http://localhost:3000/signup", input);
-	expect(output.data).toBe(-3)
+	const responseSignup = await axios.post("http://localhost:3000/signup", input);
+	expect(responseSignup.status).toBe(422);
+	const outputSignup = responseSignup.data;
+	expect(outputSignup.message).toBe("Invalid name");
 });
 
-test("Deve não criar uma conta para o passageiro com o mesmo e-mail -4", async function () {
+test("Deve não criar uma conta para o passageiro com o mesmo e-mail", async function () {
 	const fixedEmail = `john.doe@gmail.com`;
-	const input1 = {
+	const input = {
 		name: "John Doe",
 		email: fixedEmail,
 		cpf: "87748248800",
 		isPassenger: true
 	};
-	const output1 = await axios.post("http://localhost:3000/signup", input1);
-	const input2 = {
-		name: "Michael Jackson",
-		email: fixedEmail,
-		cpf: "97456321558",
-		isPassenger: true
-	};
-	const output2 = await axios.post("http://localhost:3000/signup", input2);
-	expect(output2.data).toBe(-4);
+	await axios.post("http://localhost:3000/signup", input);
+	const responseSignup = await axios.post("http://localhost:3000/signup", input);
+	expect(responseSignup.status).toBe(422);
+	const outputSignup = responseSignup.data;
+	expect(outputSignup.message).toBe("Account already exists");
 });
 
-test("Deve não criar uma conta para o motorista com a placa do carro inválida -5", async function () {
+test("Deve não criar uma conta para o motorista com a placa do carro inválida", async function () {
 	const input = {
 		name: "John Doe",
 		email: `john.doe${Math.random()}@gmail.com`,
@@ -103,6 +105,8 @@ test("Deve não criar uma conta para o motorista com a placa do carro inválida 
 		isDriver: true,
 		carPlate: "1234567"
 	};
-	const output = await axios.post("http://localhost:3000/signup", input);
-	expect(output.data).toBe(-5);
+	const responseSignup = await axios.post("http://localhost:3000/signup", input);
+	expect(responseSignup.status).toBe(422);
+	const outputSignup = responseSignup.data;
+	expect(outputSignup.message).toBe("Invalid car plate");
 });

@@ -33,59 +33,49 @@ test("Deve criar uma conta para um motorista", async function () {
 	expect(responseGetAccount.car_plate).toBe(input.carPlate);
 });
 
-test("Deve criar uma conta com CPF inválido -1", async function () {
+test("Deve criar uma conta com CPF inválido", async function () {
 	const input = {
 		name: "John Doe",
 		email: `john.doe${Math.random()}@gmail.com`,
 		cpf: "12312312312",
 		isPassenger: true
 	};
-	const output = await signup(input);
-	expect(output).toBe(-1)
+	await expect(() => signup(input)).rejects.toThrow(new Error("Invalid cpf"));
 });
 
-test("Deve testar uma conta com e-mail inválido -2", async function () {
+test("Deve testar uma conta com e-mail inválido", async function () {
 	const input = {
 		name: "John Doe",
 		email: `john.doe${Math.random()}gmail.com`,
 		cpf: "87748248800",
 		isPassenger: true
 	};
-	const output = await signup(input);
-	expect(output).toBe(-2)
+	await expect(() => signup(input)).rejects.toThrow(new Error("Invalid email"));
 });
 
-test("Deve testar uma conta com nome inválido -3", async function () {
+test("Deve testar uma conta com nome inválido", async function () {
 	const input = {
 		name: "John",
 		email: `john.doe${Math.random()}@gmail.com`,
 		cpf: "87748248800",
 		isPassenger: true
 	};
-	const output = await signup(input);
-	expect(output).toBe(-3)
+	await expect(() => signup(input)).rejects.toThrow(new Error("Invalid name"));
 });
 
-test("Deve não criar uma conta para o passageiro com o mesmo e-mail -4", async function () {
-	const fixedEmail = `john.doe@gmail.com`;
-	const firstInput = {
+test("Deve não criar uma conta para o passageiro com o mesmo e-mail", async function () {
+	const input = {
 		name: "John Doe",
-		email: fixedEmail,
+		email: `john.doe${Math.random()}@gmail.com`,
 		cpf: "87748248800",
-		isPassenger: true
+		isDriver: true,
+		carPlate: "AAA4567"
 	};
-	const firstOutput = await signup(firstInput);
-	const secondInput = {
-		name: "Michael Jackson",
-		email: fixedEmail,
-		cpf: "97456321558",
-		isPassenger: true
-	};
-	const secondOutput = await signup(secondInput);
-	expect(secondOutput).toBe(-4);
+	await signup(input);
+	await expect(() => signup(input)).rejects.toThrow(new Error("Account already exists"));
 });
 
-test("Deve não criar uma conta para o motorista com a placa do carro inválida -5", async function () {
+test("Deve não criar uma conta para o motorista com a placa do carro inválida", async function () {
 	const input = {
 		name: "John Doe",
 		email: `john.doe${Math.random()}@gmail.com`,
@@ -93,6 +83,5 @@ test("Deve não criar uma conta para o motorista com a placa do carro inválida 
 		isDriver: true,
 		carPlate: "1234567"
 	};
-	const output = await signup(input);
-	expect(output).toBe(-5);
+	await expect(() => signup(input)).rejects.toThrow(new Error("Invalid car plate"));
 });
